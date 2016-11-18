@@ -60,3 +60,7 @@ services:
     class: Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder
     arguments:
       - 13
+      
+  app.controller.api_order_controller:
+    class: AppBundle\Controller\ApiController
+    autowire: true
