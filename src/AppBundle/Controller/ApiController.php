@@ -6,7 +6,7 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\FOSRestController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use AppBundle\Facade\OrderFacade;
+use AppBundle\Facade\UserOrderFacade;
 use AppBundle\Facade\UserFacade;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
@@ -16,12 +16,12 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 class ApiController extends FOSRestController
 {
 
-    private $orderFacade;
+    private $userOrderFacade;
     private $userFacade;
 
-    public function __construct(OrderFacade $orderFacade, UserFacade $userFacade)
+    public function __construct(UserOrderFacade $userOrderFacade, UserFacade $userFacade)
     {
-	$this->orderFacade = $orderFacade;
+	$this->userOrderFacade = $userOrderFacade;
 	$this->userFacade = $userFacade;
     }
 
@@ -30,7 +30,7 @@ class ApiController extends FOSRestController
      */
     public function userCheckAction(Request $request)
     {
-	$order = $this->orderFacade->getOrderByFirstLastName($request->get('firstName'), $request->get('lastName'));
+	$order = $this->userOrderFacade->getOrderByFirstLastName($request->get('firstName'), $request->get('lastName'));
 	
 	$data = ['messages' => [
 		    ['text' => "Ha! Nevim kdo jsi a jakou mas u nas objednavku"],
@@ -45,7 +45,7 @@ class ApiController extends FOSRestController
      */
     public function orderNumberAction(Request $request)
     {
-	$order = $this->orderFacade->getById($request->get('orderNumber'));
+	$order = $this->userOrderFacade->getById($request->get('orderNumber'));
 
 	if (!order)
 	{

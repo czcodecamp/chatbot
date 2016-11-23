@@ -164,6 +164,9 @@ VALUES
 /*!40000 ALTER TABLE `product_category` ENABLE KEYS */;
 UNLOCK TABLES;
 
+INSERT INTO `user_order` (`id`, `user_id`, `email`, `first_name`, `last_name`, `phone`, `street`, `city`, `post_code`, `total_price`, `date`, `shipped`, `tracking_number`, `note`) VALUES
+(1, 1, 'chatbotcc@gmail.com', 'Jarda', 'Kabrňák', '777333111', 'Hrbolatá', 'Komárov', '30041', 1200, '2016-11-16 07:26:20', 0, 123456789, ''),
+(2, 1, 'chatbotcc@gmail.com', 'Jarda', 'Kabrňák', '777333111', 'Hrbolatá', 'Komárov', '30041', 5196, '2016-11-05 15:13:11', 0, 222233333, '');
 
 
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
