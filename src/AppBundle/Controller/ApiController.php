@@ -31,31 +31,149 @@ class ApiController extends FOSRestController
     public function userCheckAction(Request $request)
     {
 	$order = $this->userOrderFacade->getOrderByFirstLastName($request->get('firstName'), $request->get('lastName'));
-	
-	$data = ['messages' => [
-		    ['text' => "Ha! Nevim kdo jsi a jakou mas u nas objednavku"],
-		    ['text' => "Jake je cislo tvoji objednavky?"],
-		    ['text' => $order]]];
+
+	if (!$order)
+	{
+	    $data = [
+		"messages" => [
+			[
+			"attachment" => [
+			    "type" => "template",
+			    "payload" => [
+				"template_type" => "button",
+				"text" => "Ha! Nevíme kdo jsi a jakou máš u nás objednávku",
+				"buttons" => [
+					[
+					"type" => "show_block",
+					"block_name" => "Neznam objednavku",
+					"title" => "Ok, zadám číslo objednávky"
+				    ],
+				]
+			    ]
+			]
+		    ]
+		]
+	    ];
+	}
+	else
+	{
+	    $data = [
+		"set_variables" =>
+			[
+			"orderNumber" => $order->getId(),			
+		    ]
+		,
+		"messages" => [
+			[
+			"attachment" => [
+			    "type" => "template",
+			    "payload" => [
+				"template_type" => "button",
+				"text" => "Našli jsme tuto objednávku s číslem " . $order->getId() . ". Je to ta která tě zajímá?",
+				"buttons" => [
+					[
+					"type" => "show_block",
+					"block_name" => "Znam objednavku",
+					"title" => "Ano"
+				    ],
+					[
+					"type" => "show_block",
+					"block_name" => "Neznam objednavku",
+					"title" => "Ne"
+				    ]
+				]
+			    ]
+			]
+		    ]
+		]
+	    ];
+	}
+
+
 	$view = $this->view($data, Response::HTTP_OK);
 	return $view;
     }
 
     /**
-     * @Rest\Get("/api/objednavka/{orderNumber}")
+     * @Rest\Get("/api/checkUserOrder/{orderNumber}")
      */
-    public function orderNumberAction(Request $request)
+    public function checkUserOrderAction(Request $request)
     {
-	$order = $this->userOrderFacade->getById($request->get('orderNumber'));
+	$order = $this->userOrderFacade->getOrderById($request->get('orderNumber'));
 
-	if (!order)
+	if (!$order)
+	{
+	    $data = [
+		"messages" => [
+			[
+			"attachment" => [
+			    "type" => "template",
+			    "payload" => [
+				"template_type" => "button",
+				"text" => "Objednávku s číslem " . $request->get('orderNumber') . " v systému nemáme",
+				"buttons" => [
+					[
+					"type" => "show_block",
+					"block_name" => "Neznam objednavku",
+					"title" => "Ok, zkusím jinou"
+				    ],
+				]
+			    ]
+			]
+		    ]
+		]
+	    ];
+	}
+	else
+	{
+	    $data = [
+		"messages" => [
+			[
+			"attachment" => [
+			    "type" => "template",
+			    "payload" => [
+				"template_type" => "button",
+				"text" => "Našli jsme objednávku s číslem " . $order->getId() . ". Je to ta která tě zajímá?",
+				"buttons" => [
+					[
+					"type" => "show_block",
+					"block_name" => "Znam objednavku",
+					"title" => "Ano"
+				    ],
+					[
+					"type" => "show_block",
+					"block_name" => "Neznam objednavku",
+					"title" => "Ne"
+				    ]
+				]
+			    ]
+			]
+		    ]
+		]
+	    ];
+	}
+
+
+	$view = $this->view($data, Response::HTTP_OK);
+	return $view;
+    }
+
+    /**
+     * @Rest\Get("/api/getUserOrder/{orderNumber}")
+     */
+    public function getUserOrderAction(Request $request)
+    {
+	$order = $this->userOrderFacade->getOrderById($request->get('orderNumber'));
+
+	if (!$order)
 	{
 	    $data = ['messages' => [
-			['text' => "Objednávku " . $request->get('orderNumber') . "v systému nemáme."]]];
+			['text' => "Objednávku s číslem " . $request->get('orderNumber') . "v systému nemáme."]]];
 	}
 	else
 	{
 	    $data = ['messages' => [
-			['text' => "Objednávka " . $request->get('orderNumber') . " " . ($order['shipped'] ? "byla odeslána" : "nebyla ještě odeslána")]]];
+			['text' => "Objednávka s číslem " . $request->get('orderNumber') . " " . ($order->getShipped() ? "byla odeslána" : "nebyla ještě odeslána")]]];
 	}
 
 	$view = $this->view($data, Response::HTTP_OK);
