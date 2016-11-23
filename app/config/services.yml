@@ -23,6 +23,10 @@ services:
   app.controller.user_controller:
     class: AppBundle\Controller\UserController
     autowire: true
+    
+  app.controller.api_controller:
+    class: AppBundle\Controller\ApiController
+    autowire: true
 
   app.facade.category_facade:
     class: AppBundle\Facade\CategoryFacade
@@ -34,6 +38,10 @@ services:
 
   app.facade.user_facade:
     class: AppBundle\Facade\UserFacade
+    autowire: true
+    
+  app.facade.order_facade:
+    class: AppBundle\Facade\OrderFacade
     autowire: true
 
   app.repository.address_repository:
@@ -55,12 +63,13 @@ services:
     class: AppBundle\Repository\ProductRepository
     factory:   ['@doctrine.orm.default_entity_manager', getRepository]
     arguments: ['AppBundle\Entity\Product']
+    
+  app.repository.order_repository:
+    class: AppBundle\Repository\OrderRepository
+    factory:   ['@doctrine.orm.default_entity_manager', getRepository]
+    arguments: ['AppBundle\Entity\Order']
 
   encoder:
     class: Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder
     arguments:
       - 13
-      
-  app.controller.api_order_controller:
-    class: AppBundle\Controller\ApiController
-    autowire: true

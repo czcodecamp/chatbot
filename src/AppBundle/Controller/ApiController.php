@@ -6,19 +6,37 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\FOSRestController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use AppBundle\Facade\OrderFacade;
+use AppBundle\Facade\UserFacade;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
+/**
+ * @Route(service="app.controller.api_controller")
+ */
 class ApiController extends FOSRestController
 {
 
-    /**
-     * @Rest\Get("/api/objednavka")
-     */
-    public function orderAction(Request $request)
+    private $orderFacade;
+    private $userFacade;
+
+    public function __construct(OrderFacade $orderFacade, UserFacade $userFacade)
     {
+	$this->orderFacade = $orderFacade;
+	$this->userFacade = $userFacade;
+    }
+
+    /**
+     * @Rest\Get("/api/userCheck/{firstName}/{lastName}")
+     */
+    public function userCheckAction(Request $request)
+    {
+	$order = $this->orderFacade->getOrderByFirstLastName($request->get('firstName'), $request->get('lastName'));
+	
 	$data = ['messages' => [
 		    ['text' => "Ha! Nevim kdo jsi a jakou mas u nas objednavku"],
-		    ['text' => "Jake je cislo tvoji objednavky?"]]];
-	$view = $this->view($data, Response::HTTP_INTERNAL_SERVER_ERROR);
+		    ['text' => "Jake je cislo tvoji objednavky?"],
+		    ['text' => $order]]];
+	$view = $this->view($data, Response::HTTP_OK);
 	return $view;
     }
 
@@ -27,9 +45,20 @@ class ApiController extends FOSRestController
      */
     public function orderNumberAction(Request $request)
     {
-	$data = ['messages' => [
-		    ['text' => "Cislo a stav objednavky " . $request->get('orderNumber') . " je Odeslana"]]];
-	$view = $this->view($data, Response::HTTP_INTERNAL_SERVER_ERROR);
+	$order = $this->orderFacade->getById($request->get('orderNumber'));
+
+	if (!order)
+	{
+	    $data = ['messages' => [
+			['text' => "Objednávku " . $request->get('orderNumber') . "v systému nemáme."]]];
+	}
+	else
+	{
+	    $data = ['messages' => [
+			['text' => "Objednávka " . $request->get('orderNumber') . " " . ($order['shipped'] ? "byla odeslána" : "nebyla ještě odeslána")]]];
+	}
+
+	$view = $this->view($data, Response::HTTP_OK);
 	return $view;
     }
 
