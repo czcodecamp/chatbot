@@ -23,7 +23,7 @@ class OrderDetails
 
     /**
      * @var Order
-     * @ORM\ManyToOne(targetEntity="Order")
+     * @ORM\ManyToOne(targetEntity="UserOrder")
      */
     private $order;
 

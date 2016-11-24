@@ -7,10 +7,10 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Order
  *
- * @ORM\Table(name="order")
- * @ORM\Entity(repositoryClass="AppBundle\Repository\OrderRepository")
+ * @ORM\Table(name="user_order")
+ * @ORM\Entity(repositoryClass="AppBundle\Repository\UserOrderRepository")
  */
-class Order
+class UserOrder
 {
     /**
      * @var int

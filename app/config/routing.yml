@@ -4,3 +4,8 @@ app:
 
 user_logout:
     path: "/odhlasit"
+    
+api:
+    resource: "@AppBundle/Controller/ApiController.php"
+    type:     rest
+    prefix:   /api
