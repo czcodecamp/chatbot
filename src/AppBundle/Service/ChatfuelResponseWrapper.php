@@ -14,11 +14,26 @@ class ChatfuelResponseWrapper
 	);
     }
 
-    
-    public function getQuickReply($blockName,$title){
-	return array(
-	  "title" => $title,
-          "block_names" => array($blockName)
+    public function getQuickReply($blockName, $title, $variables = array())
+    {
+
+	$data = array(
+	    "title" => $title,
+	    "block_names" => array($blockName)
 	);
+
+	if (!empty($variables))
+	{
+	    $dataVariable = array();
+	    foreach ($variables as $key => $value)
+	    {
+		$dataVariable[$key] = $value;
+	    }
+	    
+	    $data['set_variables'] = $dataVariable;
+	}
+
+	return $data;
     }
+
 }

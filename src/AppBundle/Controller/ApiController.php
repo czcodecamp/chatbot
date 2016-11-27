@@ -187,14 +187,25 @@ class ApiController extends FOSRestController
 
     /**
      * @Rest\Get("/api/getCategory/")
+     * @Rest\Get("/api/getCategory/{parentCategoryId}")
      */
     public function getCategory(Request $request)
     {
-	$categories = $this->categoryFacade->getTopLevelCategoriesWithLimit(4);
+	$parentCategoryId = $request->get('parentCategoryId');
+	if (isset($parentCategoryId)){
+	    $parentCategory = $this->categoryFacade->getById($parentCategoryId);
+	    $categories = $this->categoryFacade->getChildCategoriesWithLimit($parentCategory, 4);
+	} else {
+	    $categories = $this->categoryFacade->getTopLevelCategoriesWithLimit(4);
+	}
+	
+	if($empty($categories)){
+	    //Žádná podkategorie -> vypsat produkty
+	}
 	$replies = array();
 	foreach ($categories as $category)
 	{
-	    $replies[] = $this->chatfuelResponseService->getQuickReply('Produkty', $category->getMenuTitle());
+	    $replies[] = $this->chatfuelResponseService->getQuickReply('Podkategorie', $category->getMenuTitle(), array('kategorie' => $category->getId()));
 	}
 
 	$data = [
