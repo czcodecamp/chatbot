@@ -9,57 +9,75 @@ use AppBundle\Repository\CategoryRepository;
  * @author Vašek Boch <vasek.boch@live.com>
  * @author Jan Klat <jenik@klatys.cz>
  */
-class CategoryFacade {
+class CategoryFacade
+{
 
-	private $categoryRepository;
+    private $categoryRepository;
 
-	public function __construct(CategoryRepository $categoryRepository) {
-		$this->categoryRepository = $categoryRepository;
-	}
+    public function __construct(CategoryRepository $categoryRepository)
+    {
+	$this->categoryRepository = $categoryRepository;
+    }
 
-	/** @return Category */
-	public function getBySlug($slug) {
-		return $this->categoryRepository->findOneBy([
-			"slug" => $slug,
-		]);
+    /** @return Category */
+    public function getBySlug($slug)
+    {
+	return $this->categoryRepository->findOneBy([
+		    "slug" => $slug,
+	]);
+    }
+    
+    public function getById($id){
+	return $this->categoryRepository->findOneBy([
+	    "id" => $id,
+	]);
+    }
 
-	}
-
-	/** @return Category[] */
-	public function getParentCategories(Category $category) {
-		return $this->categoryRepository->findBy(
+    /** @return Category[] */
+    public function getParentCategories(Category $category)
+    {
+	return $this->categoryRepository->findBy(
 			[
-				"parentCategory" => $category,
-			],
-			[
-				"rank" => "desc",
+		    "parentCategory" => $category,
+			], [
+		    "rank" => "desc",
 			]
-		);
-	}
+	);
+    }
 
-	/** @return Category[] */
-	public function getTopLevelCategories() {
-		return $this->categoryRepository->findBy(
+    /** @return Category[] */
+    public function getTopLevelCategories()
+    {
+	return $this->categoryRepository->findBy(
 			[
-				"level" => 0,
-			],
-			[
-				"rank" => "desc",
+		    "level" => 0,
+			], [
+		    "rank" => "desc",
 			]
-		);
-	}
-	
-		/** @return Category[] */
-	public function getTopLevelCategoriesWithLimit($limit) {
-		return $this->categoryRepository->findBy(
+	);
+    }
+
+    /** @return Category[] */
+    public function getTopLevelCategoriesWithLimit($limit)
+    {
+	return $this->categoryRepository->findBy(
 			[
-				"level" => 0,
-			],
+		    "level" => 0,
+			], [
+		    "rank" => "desc",
+			], $limit, 0
+	);
+    }
+
+    public function getChildCategoriesWithLimit($parentCategory, $limit)
+    {
+	return $this->categoryRepository->findBy(
 			[
-				"rank" => "desc",
-			],
-			$limit,0
-		);
-	}
+		    "parentCategory" => $parentCategory,
+			], [
+		    "rank" => "desc",
+			], $limit, 0
+	);
+    }
 
 }
