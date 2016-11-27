@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 use AppBundle\Facade\UserOrderFacade;
 use AppBundle\Facade\UserFacade;
 use AppBundle\Facade\CategoryFacade;
+use AppBundle\Facade\ProductFacade;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
 /**
@@ -21,13 +22,15 @@ class ApiController extends FOSRestController
     private $userFacade;
     private $categoryFacade;
     private $chatfuelResponseService;
+    private $productFacade;
 
-    public function __construct(UserOrderFacade $userOrderFacade, UserFacade $userFacade, CategoryFacade $categoryFacade)
+    public function __construct(UserOrderFacade $userOrderFacade, UserFacade $userFacade, CategoryFacade $categoryFacade, ProductFacade $productFacade)
     {
 	$this->userOrderFacade = $userOrderFacade;
 	$this->userFacade = $userFacade;
 	$this->categoryFacade = $categoryFacade;
 	$this->chatfuelResponseService = new \AppBundle\Service\ChatfuelResponseWrapper();
+	$this->productFacade = $productFacade;
     }
 
     /**
@@ -192,16 +195,37 @@ class ApiController extends FOSRestController
     public function getCategory(Request $request)
     {
 	$parentCategoryId = $request->get('parentCategoryId');
-	if (isset($parentCategoryId)){
+	if (isset($parentCategoryId))
+	{
 	    $parentCategory = $this->categoryFacade->getById($parentCategoryId);
-	    $categories = $this->categoryFacade->getChildCategoriesWithLimit($parentCategory, 4);
-	} else {
+	    $categories = $this->categoryFacade->getChildCategoriesWithLimit($parentCategory, 5);
+	    if (empty($categories))
+	    {
+		$products = $this->productFacade->findByCategory($parentCategory, 5, 0);
+		$productsData = array();
+		foreach ($products as $product)
+		{
+		    $productsData[] = $this->chatfuelResponseService->getQuickReply('Produkt', $product->getTitle(), array('produktId' => $product->getId()));
+		}
+
+		$data = [
+		    "messages" => [
+			    [
+			    "text" => "Vyber si produkt, který chceš přidat do košíku.",
+			    "quick_replies" => $productsData
+			]
+		    ]
+		];
+		
+		$view = $this->view($data, Response::HTTP_OK);
+		return $view;
+	    }
+	}
+	else
+	{
 	    $categories = $this->categoryFacade->getTopLevelCategoriesWithLimit(4);
 	}
-	
-	if($empty($categories)){
-	    //Žádná podkategorie -> vypsat produkty
-	}
+
 	$replies = array();
 	foreach ($categories as $category)
 	{
@@ -217,6 +241,17 @@ class ApiController extends FOSRestController
 	    ]
 	];
 
+	$view = $this->view($data, Response::HTTP_OK);
+	return $view;
+    }
+    
+    /**     
+     * @Rest\Get("/api/addProduct/{productId}/{productCount}")
+     */
+    public function addProduct(Request $request){
+	$data = ['messages' => [
+			['text' => "Produkt byl přídán do košíku (nebyl, nemáme košík"]]];
+	
 	$view = $this->view($data, Response::HTTP_OK);
 	return $view;
     }
