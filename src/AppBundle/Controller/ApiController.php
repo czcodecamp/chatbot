@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use AppBundle\Facade\UserOrderFacade;
 use AppBundle\Facade\UserFacade;
+use AppBundle\Facade\CategoryFacade;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
 /**
@@ -18,11 +19,15 @@ class ApiController extends FOSRestController
 
     private $userOrderFacade;
     private $userFacade;
+    private $categoryFacade;
+    private $chatfuelResponseService;
 
-    public function __construct(UserOrderFacade $userOrderFacade, UserFacade $userFacade)
+    public function __construct(UserOrderFacade $userOrderFacade, UserFacade $userFacade, CategoryFacade $categoryFacade)
     {
 	$this->userOrderFacade = $userOrderFacade;
 	$this->userFacade = $userFacade;
+	$this->categoryFacade = $categoryFacade;
+	$this->chatfuelResponseService = new \AppBundle\Service\ChatfuelResponseWrapper();
     }
 
     /**
@@ -59,9 +64,9 @@ class ApiController extends FOSRestController
 	{
 	    $data = [
 		"set_variables" =>
-			[
-			"orderNumber" => $order->getId(),			
-		    ]
+		    [
+		    "orderNumber" => $order->getId(),
+		]
 		,
 		"messages" => [
 			[
@@ -175,6 +180,31 @@ class ApiController extends FOSRestController
 	    $data = ['messages' => [
 			['text' => "Objednávka s číslem " . $request->get('orderNumber') . " " . ($order->getShipped() ? "byla odeslána" : "nebyla ještě odeslána")]]];
 	}
+
+	$view = $this->view($data, Response::HTTP_OK);
+	return $view;
+    }
+
+    /**
+     * @Rest\Get("/api/getCategory/")
+     */
+    public function getCategory(Request $request)
+    {
+	$categories = $this->categoryFacade->getTopLevelCategoriesWithLimit(4);
+	$replies = array();
+	foreach ($categories as $category)
+	{
+	    $replies[] = $this->chatfuelResponseService->getQuickReply('Produkty', $category->getMenuTitle());
+	}
+
+	$data = [
+	    "messages" => [
+		    [
+		    "text" => "Vyber si kategorii",
+		    "quick_replies" => $replies
+		]
+	    ]
+	];
 
 	$view = $this->view($data, Response::HTTP_OK);
 	return $view;

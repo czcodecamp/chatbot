@@ -48,5 +48,18 @@ class CategoryFacade {
 			]
 		);
 	}
+	
+		/** @return Category[] */
+	public function getTopLevelCategoriesWithLimit($limit) {
+		return $this->categoryRepository->findBy(
+			[
+				"level" => 0,
+			],
+			[
+				"rank" => "desc",
+			],
+			$limit,0
+		);
+	}
 
 }
