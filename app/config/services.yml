@@ -68,6 +68,16 @@ services:
     class: AppBundle\Repository\UserOrderRepository
     factory:   ['@doctrine.orm.default_entity_manager', getRepository]
     arguments: ['AppBundle\Entity\UserOrder']
+    
+  app.repository.basket_repository:
+    class: AppBundle\Repository\BasketRepository
+    factory:   ['@doctrine.orm.default_entity_manager', getRepository]
+    arguments: ['AppBundle\Entity\Basket']
+    
+  app.repository.basket_detail_repository:
+    class: AppBundle\Repository\BasketDetailRepository
+    factory:   ['@doctrine.orm.default_entity_manager', getRepository]
+    arguments: ['AppBundle\Entity\BasketDetail']
 
   encoder:
     class: Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder
