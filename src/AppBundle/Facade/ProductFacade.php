@@ -35,6 +35,13 @@ class ProductFacade {
 			"slug" => $slug,
 		]);
 	}
+	
+	public function getById($id)
+	{
+	    return $this->productRepository->findOneBy([
+		    "id" => $id,
+	    ]);
+	}
 
 	public function getAll($limit, $offset) {
 		return $this->productRepository->findBy(

@@ -8,9 +8,13 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use AppBundle\Facade\UserOrderFacade;
 use AppBundle\Facade\UserFacade;
+use AppBundle\Facade\OrderFacade;
 use AppBundle\Facade\CategoryFacade;
 use AppBundle\Facade\ProductFacade;
+use AppBundle\Facade\BasketFacade;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use AppBundle\Entity\Basket;
+use AppBundle\Entity\BasketDetail;
 
 /**
  * @Route(service="app.controller.api_controller")
@@ -23,14 +27,18 @@ class ApiController extends FOSRestController
     private $categoryFacade;
     private $chatfuelResponseService;
     private $productFacade;
+    private $basketFacade;
+    private $orderFacade;
 
-    public function __construct(UserOrderFacade $userOrderFacade, UserFacade $userFacade, CategoryFacade $categoryFacade, ProductFacade $productFacade)
+    public function __construct(UserOrderFacade $userOrderFacade, UserFacade $userFacade, CategoryFacade $categoryFacade, ProductFacade $productFacade, BasketFacade $basketFacade, OrderFacade $orderFacade)
     {
 	$this->userOrderFacade = $userOrderFacade;
 	$this->userFacade = $userFacade;
 	$this->categoryFacade = $categoryFacade;
 	$this->chatfuelResponseService = new \AppBundle\Service\ChatfuelResponseWrapper();
 	$this->productFacade = $productFacade;
+	$this->basketFacade = $basketFacade;
+	$this->orderFacade = $orderFacade;
     }
 
     /**
@@ -216,7 +224,7 @@ class ApiController extends FOSRestController
 			]
 		    ]
 		];
-		
+
 		$view = $this->view($data, Response::HTTP_OK);
 		return $view;
 	    }
@@ -244,14 +252,105 @@ class ApiController extends FOSRestController
 	$view = $this->view($data, Response::HTTP_OK);
 	return $view;
     }
-    
-    /**     
-     * @Rest\Get("/api/addProduct/{productId}/{productCount}")
+
+    /**
+     * @Rest\Get("/api/addProduct/{productId}/{productCount}/")  
+     * @Rest\Get("/api/addProduct/{productId}/{productCount}/{basketId}")
      */
-    public function addProduct(Request $request){
-	$data = ['messages' => [
-			['text' => "Produkt byl přídán do košíku (nebyl, nemáme košík"]]];
-	
+    public function addProduct(Request $request)
+    {
+
+	$basketId = $request->get('basketId');
+	$basket = $this->basketFacade->getById($basketId);
+	if (!$basket)
+	{
+	    $basket = new Basket();
+	    $basket->setDate(new \DateTime());
+	    $basket->setState(0);
+	    $this->basketFacade->saveBasket($basket);
+	    $basketId = $basket->getId();
+	}
+
+	$product = $this->productFacade->getById($request->get('productId'));
+	$productDetail = new BasketDetail();
+	$productDetail->setPrice($product->getPrice() * $request->get('productCount'));
+	$productDetail->setQuantity($request->get('productCount'));
+	$productDetail->setProductId($product);
+	$productDetail->setBasketId($basket);
+	$this->basketFacade->saveBasketDetail($productDetail);
+
+	$buttons = array();
+	$variables = array('basketId' => $basketId);
+	$buttons[] = $this->chatfuelResponseService->getButton("Doporucit", "Doporučit podobný", $variables);
+	$buttons[] = $this->chatfuelResponseService->getButton("Kategorie", "Vybrat kategorii", $variables);
+	$buttons[] = $this->chatfuelResponseService->getButton("Objednat", "To je vše. Objednat", $variables);
+	$data = [
+	    "messages" => [
+		    [
+		    "attachment" => [
+			"type" => "template",
+			"payload" => [
+			    "template_type" => "button",
+			    "text" => "Produkt byl pridan do kosiku. Co dal?",
+			    "buttons" => $buttons
+			]
+		    ]
+		]
+	    ]
+	];
+
+	$view = $this->view($data, Response::HTTP_OK);
+	return $view;
+    }
+
+    /**
+     * @Rest\Get("/api/recommendProduct/{productId}/")    
+     */
+    public function recommendProduct(Request $request)
+    {
+	$baseProduct = $this->productFacade->getById($request->get('productId'));
+	$products = $this->orderFacade->getRecomandedProduct($baseProduct, 3);
+
+	if (!$products)
+	{
+	    $buttons = array();
+	    $buttons[] = $this->chatfuelResponseService->getButton("Kategorie", "Vybrat kategorii");
+	    $buttons[] = $this->chatfuelResponseService->getButton("Objednat", "To je vše. Objednat");
+	    $data = [
+		"messages" => [
+			[
+			"attachment" => [
+			    "type" => "template",
+			    "payload" => [
+				"template_type" => "button",
+				"text" => "Nenašel jsem žádný produkt, který bych mohl teď doporučit. Co tedy dál?",
+				"buttons" => $buttons
+			    ]
+			]
+		    ]
+		]
+	    ];
+	    $view = $this->view($data, Response::HTTP_OK);
+	    return $view;
+	}
+
+	$replies = array();
+	foreach ($products as $product)
+	{
+	    $variables = array('productId' => $product->getId());
+	    $replies[] = $this->chatfuelResponseService->getQuickReply("Produkt", $product->getTitle(), $variables);
+	}
+
+	$data = [
+	    "messages" => [
+		    [
+		    "text" => "Naši zákazníky také k " . $baseProduct->getTitle() . " koupili:",
+		    "quick_replies" => $replies
+		]
+	    ]
+	];
+
+
 	$view = $this->view($data, Response::HTTP_OK);
 	return $view;
     }

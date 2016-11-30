@@ -5,13 +5,20 @@ namespace AppBundle\Service;
 class ChatfuelResponseWrapper
 {
 
-    public function getButton($blockName, $title)
+    public function getButton($blockName, $title, $variables = array())
     {
-	return array(
+	$data = array(
 	    "type" => "show_block",
 	    "block_name" => $blockName,
 	    "title" => $title
 	);
+
+	if (!empty($variables))
+	{
+	    $data['set_variables'] = $this->getVariables($variables);
+	}
+
+	return $data;
     }
 
     public function getQuickReply($blockName, $title, $variables = array())
@@ -24,16 +31,22 @@ class ChatfuelResponseWrapper
 
 	if (!empty($variables))
 	{
-	    $dataVariable = array();
-	    foreach ($variables as $key => $value)
-	    {
-		$dataVariable[$key] = $value;
-	    }
-	    
-	    $data['set_variables'] = $dataVariable;
+	    $data['set_variables'] = $this->getVariables($variables);
 	}
 
 	return $data;
+    }
+
+    public function getVariables($variables)
+    {
+
+	$dataVariable = array();
+	foreach ($variables as $key => $value)
+	{
+	    $dataVariable[$key] = $value;
+	}
+
+	return $dataVariable;
     }
 
 }

@@ -43,7 +43,15 @@ services:
   app.facade.user_order_facade:
     class: AppBundle\Facade\UserOrderFacade
     autowire: true
+    
+  app.facade.order_facade:
+    class: AppBundle\Facade\OrderFacade
+    autowire: true
 
+  app.facade.basket_facade:
+    class: AppBundle\Facade\BasketFacade
+    autowire: true
+      
   app.repository.address_repository:
     class: AppBundle\Repository\AddressRepository
     factory:   ['@doctrine.orm.default_entity_manager', getRepository]
@@ -68,6 +76,11 @@ services:
     class: AppBundle\Repository\UserOrderRepository
     factory:   ['@doctrine.orm.default_entity_manager', getRepository]
     arguments: ['AppBundle\Entity\UserOrder']
+    
+  app.repository.order_details_repository:
+    class: AppBundle\Repository\OrderDetailsRepository
+    factory:   ['@doctrine.orm.default_entity_manager', getRepository]
+    arguments: ['AppBundle\Entity\OrderDetails']
     
   app.repository.basket_repository:
     class: AppBundle\Repository\BasketRepository
