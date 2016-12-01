@@ -21,6 +21,17 @@ class OrderFacade
 	$this->orderDetailRepository = $orderDetailRepository;
 	$this->entityManager = $entityManager;
     }
+    
+    public function getById($id)
+    {
+	if (!isset($id) || !$id)
+	{
+	    return false;
+	}
+	return $this->orderRepository->findOneBy([
+		    "id" => $id,
+	]);
+    }
 
     public function getRecomandedProduct($product, $limit)
     {

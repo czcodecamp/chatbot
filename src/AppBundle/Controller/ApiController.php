@@ -325,7 +325,7 @@ class ApiController extends FOSRestController
 			    "type" => "template",
 			    "payload" => [
 				"template_type" => "button",
-				"text" => "Nenašel jsem žádný produkt, který bych mohl teď doporučit. Co tedy dál?",
+				"text" => "Nenašli jsem žádný produkt, který bych mohl teď doporučit. Co tedy dál?",
 				"buttons" => $buttons
 			    ]
 			]
@@ -359,7 +359,7 @@ class ApiController extends FOSRestController
     }
 
     /**
-     * @Rest\Get("/api/completeOrderCheckUser/{firstName}/{lastname}")    
+     * @Rest\Get("/api/completeOrderCheckUser/{firstName}/{lastName}")  
      */
     public function orderUserCheck(Request $request)
     {
@@ -374,12 +374,12 @@ class ApiController extends FOSRestController
 			    "type" => "template",
 			    "payload" => [
 				"template_type" => "button",
-				"text" => "Nenašel jsem žádnou tvoji přechozí objednávku. Kam chceš tuhle objednávku poslat?",
+				"text" => "Nenašli jsem žádnou tvoji přechozí objednávku. Kam chceš tuhle objednávku poslat?",
 				"buttons" => [
 					[
 					"type" => "show_block",
 					"block_name" => "Neznam adresu",
-					"title" => "Ok, zadám doručovací adresu"
+					"title" => "Zadám adresu"
 				    ],
 				]
 			    ]
@@ -390,31 +390,19 @@ class ApiController extends FOSRestController
 	}
 	else
 	{
+	    $buttons = array();
+	    $buttons[] = $this->chatfuelResponseService->getButton("Ulozit adresu", "Adresa souhlasí", array("orderNumber" => $order->getId()));
+	    $buttons[] = $this->chatfuelResponseService->getButton("Neznam adresu", "Poslat jinam");
+
 	    $data = [
-		"set_variables" =>
-		    [
-		    "orderNumber" => $order->getId(),
-		]
-		,
 		"messages" => [
 			[
 			"attachment" => [
 			    "type" => "template",
 			    "payload" => [
 				"template_type" => "button",
-				"text" => "Minulou objednávku jsme posílali na adresu " . $order->getStreet() . ", " . $order->getCity . ", " . $order->postCode . ". Adresa bude stejná nebo máme objednávku poslat jinam?",
-				"buttons" => [
-					[
-					"type" => "show_block",
-					"block_name" => "Objednat",
-					"title" => "Adresa souhlasí"
-				    ],
-					[
-					"type" => "show_block",
-					"block_name" => "Neznam adresu",
-					"title" => "Poslat jinam"
-				    ]
-				]
+				"text" => "Minulou objednávku jsme posílali na adresu " . $order->getStreet() . ", " . $order->getCity() . ", " . $order->getPostCode() . ". Adresa bude stejná nebo máme objednávku poslat jinam?",
+				"buttons" => $buttons
 			    ]
 			]
 		    ]
@@ -422,6 +410,41 @@ class ApiController extends FOSRestController
 	    ];
 	}
 
+
+	$view = $this->view($data, Response::HTTP_OK);
+	return $view;
+    }
+
+    /**
+     * @Rest\Get("/api/updateAddressFromOrder/{basketId}/{orderNumber}")  
+     */
+    public function updateAddressFromOrder(Request $request)
+    {
+	$order = $this->orderFacade->getById($request->get('orderNumber'));
+	$basket = $this->basketFacade->getById($request->get('basketId'));
+
+	$basket->setStreet($order->getStreet());
+	$basket->setCity($order->getCity());
+	$basket->setPostCode($order->getPostCode());
+	$this->basketFacade->saveBasket($basket);
+
+	$buttons = array();
+	$buttons[] = $this->chatfuelResponseService->getButton("Objednat final", "Potvrzuji objednavku");
+
+	$data = [
+	    "messages" => [
+		    [
+		    "attachment" => [
+			"type" => "template",
+			"payload" => [
+			    "template_type" => "button",
+			    "text" => "Adresa uložena",
+			    "buttons" => $buttons
+			]
+		    ]
+		]
+	    ]
+	];
 
 	$view = $this->view($data, Response::HTTP_OK);
 	return $view;
@@ -453,9 +476,10 @@ class ApiController extends FOSRestController
 	    $orderDetail->setQuantity($basketDetail->getQuantity());
 	    $this->orderFacade->saveOrderDetail($orderDetail);
 	}
-	
+
 	$basket->setState(1);
-	
+	$this->basketFacade->saveBasket($basket);
+
 	$data = [
 	    "messages" => [
 		    [
@@ -463,10 +487,42 @@ class ApiController extends FOSRestController
 		]
 	    ]
 	];
-	
+
 	$view = $this->view($data, Response::HTTP_OK);
 	return $view;
-	
+    }
+
+    /**
+     * @Rest\Get("/api/updateAddress/{basketId}/{street}/{city}/{psc}")    
+     */
+    public function updateAddress(Request $request)
+    {
+	$basket = $this->basketFacade->getById($request->get('basketId'));
+
+	$basket->setStreet($request->get('street'));
+	$basket->setCity($request->get('city'));
+	$basket->setPostCode($request->get('psc'));
+	$this->basketFacade->saveBasket($basket);
+
+	$buttons = array();
+	$buttons[] = $this->chatfuelResponseService->getButton("Objednat final", "Potvrzuji objednávku");
+	$data = [
+	    "messages" => [
+		    [
+		    "attachment" => [
+			"type" => "template",
+			"payload" => [
+			    "template_type" => "button",
+			    "text" => "Adresa uložena",
+			    "buttons" => $buttons
+			]
+		    ]
+		]
+	    ]
+	];
+
+	$view = $this->view($data, Response::HTTP_OK);
+	return $view;
     }
 
 }

@@ -45,21 +45,21 @@ class Basket
     /**
      * @var string
      *
-     * @ORM\Column(name="street", type="string", length=255)
+     * @ORM\Column(name="street", type="string", length=255, nullable=true)
      */
     private $street;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="city", type="string", length=255)
+     * @ORM\Column(name="city", type="string", length=255, nullable=true)
      */
     private $city;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="post_code", type="string", length=255)
+     * @ORM\Column(name="post_code", type="string", length=255, nullable=true)
      */
     private $postCode;
 

@@ -16,7 +16,7 @@ class OrderDetailsRepository extends \Doctrine\ORM\EntityRepository
 		->select('p.id,p.title, count(1) as count1')
 		->from('AppBundle\Entity\OrderDetails', 'products')
 		->join('AppBundle\Entity\OrderDetails', 'orders', 'WITH', 'products.order = orders.order')
-		->join('AppBundle\Entity\Product', 'p', 'WITH', 'products.product = p')
+		->join('AppBundle\Entity\Product', 'p', 'WITH', 'orders.product = p')
 		->where('products.product = :product and orders.product != :product')		
 		->addGroupBy('p.id, p.title')
 		->addOrderBy('count1', 'desc')
