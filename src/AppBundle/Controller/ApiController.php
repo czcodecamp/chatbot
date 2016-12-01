@@ -239,7 +239,7 @@ class ApiController extends FOSRestController
 	$replies = array();
 	foreach ($categories as $category)
 	{
-	    $replies[] = $this->chatfuelResponseService->getQuickReply('Podkategorie', $category->getMenuTitle(), array('kategorie' => $category->getId()));
+	    $replies[] = $this->chatfuelResponseService->getQuickReply('Podkategorie', trim(str_replace("-", "", $category->getMenuTitle())), array('kategorie' => $category->getId()));
 	}
 
 	$data = [
@@ -454,7 +454,7 @@ class ApiController extends FOSRestController
 	    $this->orderFacade->saveOrderDetail($orderDetail);
 	}
 	
-	//prepocitat cenu
+	$basket->setState(1);
 	
 	$data = [
 	    "messages" => [
