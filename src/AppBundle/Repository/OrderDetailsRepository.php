@@ -13,12 +13,12 @@ class OrderDetailsRepository extends \Doctrine\ORM\EntityRepository
     public function getRecomandedProduct($product)
     {
 	$builder = $this->_em->createQueryBuilder()
-		->select('p.id, count(1) as count1')
+		->select('p.id,p.title, count(1) as count1')
 		->from('AppBundle\Entity\OrderDetails', 'products')
 		->join('AppBundle\Entity\OrderDetails', 'orders', 'WITH', 'products.order = orders.order')
 		->join('AppBundle\Entity\Product', 'p', 'WITH', 'products.product = p')
 		->where('products.product = :product and orders.product != :product')		
-		->addGroupBy('p.id')
+		->addGroupBy('p.id, p.title')
 		->addOrderBy('count1', 'desc')
 		->setParameter("product", $product);
 	return $builder;

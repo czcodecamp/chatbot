@@ -30,7 +30,7 @@ class UserOrder
     /**
      * @var string
      *
-     * @ORM\Column(name="email", type="string", length=255)
+     * @ORM\Column(name="email", type="string", length=255, nullable=true)
      */
     private $email;
 
@@ -51,7 +51,7 @@ class UserOrder
     /**
      * @var string
      *
-     * @ORM\Column(name="phone", type="string", length=255)
+     * @ORM\Column(name="phone", type="string", length=255, nullable=true)
      */
     private $phone;
 
@@ -79,7 +79,7 @@ class UserOrder
     /**
      * @var float
      *
-     * @ORM\Column(name="total_price", type="float")
+     * @ORM\Column(name="total_price", type="float", nullable=true)
      */
     private $totalPrice;
 
@@ -93,21 +93,21 @@ class UserOrder
     /**
      * @var int
      *
-     * @ORM\Column(name="shipped", type="smallint")
+     * @ORM\Column(name="shipped", type="smallint", nullable=true)
      */
     private $shipped;
 
     /**
      * @var int
      *
-     * @ORM\Column(name="tracking_number", type="integer")
+     * @ORM\Column(name="tracking_number", type="integer", nullable=true)
      */
     private $trackingNumber;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="note", type="text")
+     * @ORM\Column(name="note", type="text", nullable=true)
      */
     private $note;
 

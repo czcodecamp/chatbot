@@ -10,37 +10,48 @@ use Doctrine\ORM\EntityManager;
 
 class BasketFacade
 {
-        private $basketRepository;
-	private $basketDetailRepository;
-	private $entityManager;
 
-    public function __construct(BasketRepository $basketRepository, BasketDetail $basketDetail,EntityManager $entityManager)
+    private $basketRepository;
+    private $basketDetailRepository;
+    private $entityManager;
+
+    public function __construct(BasketRepository $basketRepository, BasketDetailRepository $basketDetail, EntityManager $entityManager)
     {
 	$this->basketRepository = $basketRepository;
 	$this->basketDetailRepository = $basketDetail;
 	$this->entityManager = $entityManager;
     }
-    
-    public function saveBasket($basket){	
-	{
-		$this->entityManager->persist($basket);
-		$this->entityManager->flush([$basket]);		
-	}
+
+    public function saveBasket($basket)
+    {
+
+	$this->entityManager->persist($basket);
+	$this->entityManager->flush($basket);
     }
-    
-    public function saveBasketDetail($basketDetail){	
-	{
-		$this->entityManager->persist($basketDetail);
-		$this->entityManager->flush([$basketDetail]);		
-	}
+
+    public function saveBasketDetail($basketDetail)
+    {
+
+	$this->entityManager->persist($basketDetail);
+	$this->entityManager->flush($basketDetail);
     }
-    
-    public function getById($id){
-	if (!isset($id) || !$id){
+
+    public function getById($id)
+    {
+	if (!isset($id) || !$id)
+	{
 	    return false;
 	}
 	return $this->basketRepository->findOneBy([
 		    "id" => $id,
 	]);
     }
+
+    public function getDetailsByBasket($basket)
+    {
+	return $this->basketDetailRepository->findBy([
+		    "basket" => $basket,
+	]);
+    }
+
 }

@@ -24,9 +24,21 @@ class OrderFacade
 
     public function getRecomandedProduct($product, $limit)
     {
-	return $this->orderDetailRepository->getRecomandedProduct($product)			
+	return $this->orderDetailRepository->getRecomandedProduct($product)
 			->setMaxResults($limit)
 			->getQuery()->getResult();
+    }
+
+    public function saveOrder($order)
+    {
+	$this->entityManager->persist($order);
+	$this->entityManager->flush($order);
+    }
+
+    public function saveOrderDetail($orderDetail)
+    {
+	$this->entityManager->persist($orderDetail);
+	$this->entityManager->flush($orderDetail);
     }
 
 }

@@ -22,13 +22,13 @@ class BasketDetail
      * @var Basket
      * @ORM\ManyToOne(targetEntity="Basket")
      */
-    private $basketId;
+    private $basket;
 
     /**
      * @var Product
      * @ORM\ManyToOne(targetEntity="Product")
      */
-    private $productId;
+    private $product;
 
     /**
      * @var float
@@ -102,50 +102,50 @@ class BasketDetail
     }
 
     /**
-     * Set basketId
+     * Set basket
      *
-     * @param \AppBundle\Entity\Basket $basketId
+     * @param \AppBundle\Entity\Basket $basket
      *
      * @return BasketDetail
      */
-    public function setBasketId(\AppBundle\Entity\Basket $basketId = null)
+    public function setBasket(\AppBundle\Entity\Basket $basket = null)
     {
-        $this->basketId = $basketId;
+        $this->basket = $basket;
 
         return $this;
     }
 
     /**
-     * Get basketId
+     * Get basket
      *
      * @return \AppBundle\Entity\Basket
      */
-    public function getBasketId()
+    public function getBasket()
     {
-        return $this->basketId;
+        return $this->basket;
     }
 
     /**
-     * Set productId
+     * Set product
      *
-     * @param \AppBundle\Entity\Product $productId
+     * @param \AppBundle\Entity\Product $product
      *
      * @return BasketDetail
      */
-    public function setProductId(\AppBundle\Entity\Product $productId = null)
+    public function setProduct(\AppBundle\Entity\Product $product = null)
     {
-        $this->productId = $productId;
+        $this->product = $product;
 
         return $this;
     }
 
     /**
-     * Get productId
+     * Get product
      *
      * @return \AppBundle\Entity\Product
      */
-    public function getProductId()
+    public function getProduct()
     {
-        return $this->productId;
+        return $this->product;
     }
 }

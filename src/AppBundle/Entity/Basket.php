@@ -41,6 +41,27 @@ class Basket
      * @ORM\Column(type="smallint")
      */
     private $state;
+    
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="street", type="string", length=255)
+     */
+    private $street;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="city", type="string", length=255)
+     */
+    private $city;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="post_code", type="string", length=255)
+     */
+    private $postCode;
 
 
     /**
@@ -147,5 +168,77 @@ class Basket
     public function getUser()
     {
         return $this->user;
+    }
+
+    /**
+     * Set street
+     *
+     * @param string $street
+     *
+     * @return Basket
+     */
+    public function setStreet($street)
+    {
+        $this->street = $street;
+
+        return $this;
+    }
+
+    /**
+     * Get street
+     *
+     * @return string
+     */
+    public function getStreet()
+    {
+        return $this->street;
+    }
+
+    /**
+     * Set city
+     *
+     * @param string $city
+     *
+     * @return Basket
+     */
+    public function setCity($city)
+    {
+        $this->city = $city;
+
+        return $this;
+    }
+
+    /**
+     * Get city
+     *
+     * @return string
+     */
+    public function getCity()
+    {
+        return $this->city;
+    }
+
+    /**
+     * Set postCode
+     *
+     * @param string $postCode
+     *
+     * @return Basket
+     */
+    public function setPostCode($postCode)
+    {
+        $this->postCode = $postCode;
+
+        return $this;
+    }
+
+    /**
+     * Get postCode
+     *
+     * @return string
+     */
+    public function getPostCode()
+    {
+        return $this->postCode;
     }
 }
