@@ -52,6 +52,8 @@ class ApiController extends FOSRestController
 
 	if (!$order)
 	{
+	    $buttons = array();
+	    $buttons[] = $this->chatfuelResponseService->getButton("Neznam objednavku", "Ok, zadám číslo objednávky");	    
 	    $data = [
 		"messages" => [
 			[
@@ -60,13 +62,7 @@ class ApiController extends FOSRestController
 			    "payload" => [
 				"template_type" => "button",
 				"text" => "Ha! Nevíme kdo jsi a jakou máš u nás objednávku",
-				"buttons" => [
-					[
-					"type" => "show_block",
-					"block_name" => "Neznam objednavku",
-					"title" => "Ok, zadám číslo objednávky"
-				    ],
-				]
+				"buttons" => $buttons
 			    ]
 			]
 		    ]
@@ -75,6 +71,9 @@ class ApiController extends FOSRestController
 	}
 	else
 	{
+	    $buttons = array();
+	    $buttons[] = $this->chatfuelResponseService->getButton("Znam objednavku", "Ano");
+	    $buttons[] = $this->chatfuelResponseService->getButton("Neznam objednavku", "Ne");
 	    $data = [
 		"set_variables" =>
 		    [
@@ -88,18 +87,7 @@ class ApiController extends FOSRestController
 			    "payload" => [
 				"template_type" => "button",
 				"text" => "Našli jsme tuto objednávku s číslem " . $order->getId() . ". Je to ta která tě zajímá?",
-				"buttons" => [
-					[
-					"type" => "show_block",
-					"block_name" => "Znam objednavku",
-					"title" => "Ano"
-				    ],
-					[
-					"type" => "show_block",
-					"block_name" => "Neznam objednavku",
-					"title" => "Ne"
-				    ]
-				]
+				"buttons" => $buttons
 			    ]
 			]
 		    ]
@@ -121,6 +109,8 @@ class ApiController extends FOSRestController
 
 	if (!$order)
 	{
+	    $buttons = array();
+	    $buttons[] = $this->chatfuelResponseService->getButton("Neznam objednavku", "Ok, zkusím jinou");
 	    $data = [
 		"messages" => [
 			[
@@ -129,13 +119,7 @@ class ApiController extends FOSRestController
 			    "payload" => [
 				"template_type" => "button",
 				"text" => "Objednávku s číslem " . $request->get('orderNumber') . " v systému nemáme",
-				"buttons" => [
-					[
-					"type" => "show_block",
-					"block_name" => "Neznam objednavku",
-					"title" => "Ok, zkusím jinou"
-				    ],
-				]
+				"buttons" => $buttons
 			    ]
 			]
 		    ]
@@ -144,6 +128,9 @@ class ApiController extends FOSRestController
 	}
 	else
 	{
+	    $buttons = array();
+	    $buttons[] = $this->chatfuelResponseService->getButton("Znam objednavku", "Ano");
+	    $buttons[] = $this->chatfuelResponseService->getButton("Neznam objednavku", "Ne");
 	    $data = [
 		"messages" => [
 			[
@@ -152,18 +139,7 @@ class ApiController extends FOSRestController
 			    "payload" => [
 				"template_type" => "button",
 				"text" => "Našli jsme objednávku s číslem " . $order->getId() . ". Je to ta která tě zajímá?",
-				"buttons" => [
-					[
-					"type" => "show_block",
-					"block_name" => "Znam objednavku",
-					"title" => "Ano"
-				    ],
-					[
-					"type" => "show_block",
-					"block_name" => "Neznam objednavku",
-					"title" => "Ne"
-				    ]
-				]
+				"buttons" => $buttons
 			    ]
 			]
 		    ]
@@ -367,6 +343,8 @@ class ApiController extends FOSRestController
 
 	if (!$order)
 	{
+	    $buttons = array();
+	    $buttons[] = $this->chatfuelResponseService->getButton("Neznam adresu", "Zadám adresu");
 	    $data = [
 		"messages" => [
 			[
@@ -375,13 +353,7 @@ class ApiController extends FOSRestController
 			    "payload" => [
 				"template_type" => "button",
 				"text" => "Nenašli jsem žádnou tvoji přechozí objednávku. Kam chceš tuhle objednávku poslat?",
-				"buttons" => [
-					[
-					"type" => "show_block",
-					"block_name" => "Neznam adresu",
-					"title" => "Zadám adresu"
-				    ],
-				]
+				"buttons" => $buttons
 			    ]
 			]
 		    ]
